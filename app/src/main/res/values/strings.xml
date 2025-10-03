@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BillGenie</string>
+    <string name="add_menu_item">Add Menu Item</string>
+    <string name="menu_items">Menu Items</string>
+    <string name="item_name">Item Name</string>
+    <string name="item_category">Category</string>
+    <string name="item_sub_type">Sub Type</string>
+    <string name="item_price">Price in Rupees</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="no_items">No menu items found.\nUse the + button to add new items.</string>
+    <string name="item_name_required">Item name is required</string>
+    <string name="item_price_required">Please enter item price in ₹</string>
+    <string name="invalid_price">Please enter a valid price in ₹</string>
+    <string name="duplicate_item_name">Item with this name already exists</string>
+    <string name="item_saved">Menu item saved successfully</string>
+    <string name="item_deleted">Menu item deleted</string>
+    <string name="confirm_delete">Are you sure you want to delete this item?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    
+    <!-- Bill Activity Strings -->
+    <string name="generate_bill">Generate Bill</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_phone">Phone Number</string>
+    <string name="customer_name_required">Customer name is required</string>
+    <string name="customer_phone_required">Phone number is required</string>
+    <string name="search_menu_item">Search Menu Item</string>
+    <string name="add_to_bill">Add to Bill</string>
+    <string name="quantity">Quantity</string>
+    <string name="bill_items">Bill Items</string>
+    <string name="no_bill_items">No items added to bill yet</string>
+    <string name="total">Total</string>
+    <string name="bill_generated">Bill generated successfully</string>
+    <string name="select_item_first">Please select a menu item first</string>
+    <string name="invalid_quantity">Please enter a valid quantity</string>
+    
+    <!-- App Information -->
+    <string name="app_version">Version 1.0</string>
+    <string name="developer_name">Developed by Nandu</string>
+    <string name="app_description">BillGenie - Restaurant Management System</string>
+    
+    <!-- Authentication Strings -->
+    <string name="welcome_to_billgenie">Welcome to BillGenie</string>
+    <string name="restaurant_management_made_easy">Restaurant Management Made Easy</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="full_name">Full Name</string>
+    <string name="email">Email</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="role">Role</string>
+    <string name="create_account">Create Account</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="dont_have_account">Don\'t have an account? Register</string>
+    <string name="logout">Logout</string>
+    <string name="logout_confirmation">Are you sure you want to logout?</string>
+    <string name="app_information">App Information</string>
+</resources>

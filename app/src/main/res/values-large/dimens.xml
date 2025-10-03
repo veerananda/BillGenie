@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- Quantity Control Dimensions - Large Screens -->
+    <dimen name="quantity_button_size">56dp</dimen>
+    <dimen name="quantity_button_text_size">24sp</dimen>
+    <dimen name="quantity_text_size">20sp</dimen>
+    <dimen name="quantity_text_min_width">48dp</dimen>
+    <dimen name="quantity_spacing">12dp</dimen>
+    
+    <!-- Category Item Dimensions - Large Screens -->
+    <dimen name="category_item_padding">20dp</dimen>
+    <dimen name="category_icon_size">28dp</dimen>
+    <dimen name="category_arrow_size">24dp</dimen>
+    <dimen name="category_text_size">18sp</dimen>
+    
+</resources>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Standard Material Design Colors -->
+    <color name="purple_50">#FFF3E5F5</color>
+    <color name="purple_100">#FFE1BEE7</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_50">#FFE0F2F1</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- BillGenie Custom Colors -->
+    <color name="primary_color">#FF6200EE</color>
+    <color name="primary_dark">#FF3700B3</color>
+    <color name="accent_color">#FF03DAC5</color>
+    <color name="background_color">#FFFFFFFF</color>
+    <color name="surface_color">#FFFFFFFF</color>
+    <color name="error_color">#FFB00020</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#DE000000</color>
+    <color name="text_secondary">#99000000</color>
+    <color name="text_on_primary">#FFFFFFFF</color>
+    
+    <!-- Card and Surface Colors -->
+    <color name="card_background">#FFFFFFFF</color>
+    <color name="divider_color">#1F000000</color>
+    <color name="outline_color">#1F000000</color>
+    
+    <!-- Additional Material Design Colors -->
+    <color name="primary">#FF6200EE</color>
+    <color name="primary_light">#F3E5F5</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="on_surface">#1C1B1F</color>
+    <color name="on_surface_variant">#49454F</color>
+    <color name="info_text">#1565C0</color>
+    <color name="info_background">#E3F2FD</color>
+    
+    <!-- Status Colors -->
+    <color name="success_color">#FF4CAF50</color>
+    <color name="warning_color">#FFFF9800</color>
+    <color name="green">#FF4CAF50</color>
+    <color name="red">#FFF44336</color>
+</resources>

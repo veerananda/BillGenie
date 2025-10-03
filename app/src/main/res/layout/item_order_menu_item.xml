@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Veg/Non-Veg Indicator -->
+        <TextView
+            android:id="@+id/tvVegStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌱"
+            android:textSize="16sp"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Item Name and Price -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvItemName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Menu Item Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#555555"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvItemPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="₹0.00"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#008000"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Quantity Controls -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border"
+            android:padding="4dp">
+
+            <ImageView
+                android:id="@+id/btnMinus"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_minus"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:contentDescription="Decrease quantity" />
+
+            <TextView
+                android:id="@+id/tvQuantity"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="?attr/colorOnSurface" />
+
+            <ImageView
+                android:id="@+id/btnPlus"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_plus"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:contentDescription="Increase quantity" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

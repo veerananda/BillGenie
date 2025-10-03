@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Veg/Non-Veg Emoji Indicator -->
+    <TextView
+        android:id="@+id/tvVegStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌱"
+        android:textSize="16sp"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Item Name (Left Side) -->
+    <TextView
+        android:id="@+id/tvItemName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Item Name"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#555555" />
+
+    <!-- Price (Right Side) -->
+    <TextView
+        android:id="@+id/tvItemPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="₹0.00"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#008000"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Edit Button -->
+    <ImageView
+        android:id="@+id/ivEditItem"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="4dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        android:contentDescription="Edit Item"
+        app:tint="#212121" />
+
+    <!-- Delete Button -->
+    <ImageView
+        android:id="@+id/ivDeleteItem"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        android:contentDescription="Delete Item"
+        app:tint="#212121" />
+
+</LinearLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Background circle -->
+    <path
+        android:fillColor="#6200EE"
+        android:pathData="M0,0h108v108h-108z"/>
+    
+    <!-- Inner circle for contrast -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0"/>
+    
+    <!-- Main content area -->
+    <group android:translateX="54" android:translateY="54">
+        
+        <!-- Receipt/Bill icon -->
+        <path
+            android:fillColor="#6200EE"
+            android:pathData="M-12,-20L12,-20Q14,-20 14,-18L14,18Q14,20 12,20L-12,20Q-14,20 -14,18L-14,-18Q-14,-20 -12,-20Z"/>
+        
+        <!-- Receipt lines -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:strokeWidth="1"
+            android:pathData="M-10,-15L10,-15M-10,-10L8,-10M-10,-5L10,-5M-10,0L6,0M-10,5L10,5M-10,10L8,10"/>
+        
+        <!-- Rupee symbol -->
+        <path
+            android:fillColor="#FF6D00"
+            android:pathData="M-8,12L-4,12Q-2,12 -1,13Q0,14 0,15Q0,16 -1,17Q-2,18 -4,18L-8,18Z"/>
+        
+        <!-- Chef hat on top -->
+        <path
+            android:fillColor="#4CAF50"
+            android:pathData="M-6,-25Q-8,-27 -6,-29Q-4,-31 -2,-29Q0,-31 2,-29Q4,-31 6,-29Q8,-27 6,-25L6,-22Q6,-21 5,-21L-5,-21Q-6,-21 -6,-22Z"/>
+        
+        <!-- Cutlery elements -->
+        <path
+            android:fillColor="#FF5722"
+            android:strokeWidth="2"
+            android:pathData="M16,-8L16,8M18,-6L18,6"/>
+        
+        <path
+            android:fillColor="#FF5722"
+            android:strokeWidth="2"
+            android:pathData="M-18,-8L-18,8M-16,-8L-16,-4M-20,-8L-20,-4"/>
+    </group>
+</vector>

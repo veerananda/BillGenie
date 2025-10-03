@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dynamic IDs for dialog creation -->
+    <item name="editTextIngredientName" type="id" />
+    <item name="editTextQuantity" type="id" />
+    <item name="editTextUnit" type="id" />
+    <item name="editTextNotes" type="id" />
+    <item name="checkboxOptional" type="id" />
+</resources>

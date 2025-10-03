@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Bill Total Display -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/purple_50"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bill Total"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tvBillTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="₹0.00"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_color"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Cash Given Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilCashGiven"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:startIconDrawable="@android:drawable/ic_menu_save"
+        app:helperText="Enter the amount given by customer">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etCashGiven"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cash Given (₹)"
+            android:inputType="numberDecimal"
+            android:maxLines="1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Change Display -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardChange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/design_default_color_secondary_variant"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Change to Return"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvChangeAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="₹0.00"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/design_default_color_secondary"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💰"
+                android:textSize="32sp" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Warning for insufficient cash -->
+    <TextView
+        android:id="@+id/tvInsufficientWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="⚠️ Insufficient cash amount"
+        android:textColor="@color/error_color"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="8dp"
+        android:visibility="gone" />
+
+</LinearLayout>
