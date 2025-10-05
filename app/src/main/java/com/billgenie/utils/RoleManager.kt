@@ -68,6 +68,31 @@ object RoleManager {
     }
     
     /**
+     * Check if current user can edit target user
+     */
+    fun canEditUser(currentUserRole: String, targetUserRole: String): Boolean {
+        return when (currentUserRole) {
+            ROLE_ADMIN -> true // Admin can edit anyone
+            ROLE_MANAGER -> targetUserRole == ROLE_STAFF // Manager can edit staff only
+            else -> false // Staff cannot edit users
+        }
+    }
+    
+    /**
+     * Check if current user can delete target user
+     */
+    fun canDeleteUser(currentUserRole: String, targetUserRole: String, isSameUser: Boolean): Boolean {
+        // Users cannot delete themselves
+        if (isSameUser) return false
+        
+        return when (currentUserRole) {
+            ROLE_ADMIN -> true // Admin can delete anyone except themselves
+            ROLE_MANAGER -> targetUserRole == ROLE_STAFF // Manager can delete staff only
+            else -> false // Staff cannot delete users
+        }
+    }
+    
+    /**
      * Get role display name
      */
     fun getRoleDisplayName(role: String): String {

@@ -32,6 +32,7 @@ class LoginActivity : AppCompatActivity() {
         }
         
         setupClickListeners()
+        checkRegistrationAvailability()
         createDefaultAdminUser()
     }
     
@@ -42,6 +43,32 @@ class LoginActivity : AppCompatActivity() {
         
         binding.tvRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+        }
+    }
+    
+    private fun checkRegistrationAvailability() {
+        lifecycleScope.launch {
+            try {
+                // Check if any admin users exist
+                val users = database.userDao().getAllUsersOnce()
+                val adminExists = users.any { it.role == "ADMIN" && it.isActive }
+                
+                runOnUiThread {
+                    if (adminExists) {
+                        // Hide register button if admin exists
+                        binding.tvRegister.visibility = android.view.View.GONE
+                    } else {
+                        // Show register button for initial setup
+                        binding.tvRegister.visibility = android.view.View.VISIBLE
+                        binding.tvRegister.text = "Create Admin Account"
+                    }
+                }
+            } catch (e: Exception) {
+                // On error, show register button (fail-safe)
+                runOnUiThread {
+                    binding.tvRegister.visibility = android.view.View.VISIBLE
+                }
+            }
         }
     }
     

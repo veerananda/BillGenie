@@ -10,6 +10,12 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE isActive = 1 ORDER BY fullName")
     fun getAllActiveUsers(): Flow<List<User>>
     
+    @Query("SELECT * FROM users ORDER BY isActive DESC, fullName")
+    fun getAllUsers(): Flow<List<User>>
+    
+    @Query("SELECT * FROM users ORDER BY isActive DESC, fullName")
+    suspend fun getAllUsersOnce(): List<User>
+    
     @Query("SELECT * FROM users WHERE username = :username AND isActive = 1 LIMIT 1")
     suspend fun getUserByUsername(username: String): User?
     
@@ -30,6 +36,12 @@ interface UserDao {
     
     @Query("UPDATE users SET isActive = 0 WHERE id = :userId")
     suspend fun deactivateUser(userId: Int)
+    
+    @Delete
+    suspend fun deleteUser(user: User)
+    
+    @Query("DELETE FROM users WHERE id = :userId")
+    suspend fun deleteUserById(userId: Int)
     
     @Query("UPDATE users SET lastLoginAt = :loginTime WHERE id = :userId")
     suspend fun updateLastLogin(userId: Int, loginTime: java.util.Date)

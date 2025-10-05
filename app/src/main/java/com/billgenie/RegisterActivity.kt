@@ -34,17 +34,54 @@ class RegisterActivity : AppCompatActivity() {
         
         database = BillGenieDatabase.getDatabase(this)
         
-        setupRoleDropdown()
+        // Check if this is public access (from login screen) and admin already exists
+        val isPublicAccess = LoginActivity.getCurrentUserId(this) == -1
+        if (isPublicAccess) {
+            lifecycleScope.launch {
+                val adminExists = checkIfAdminExists()
+                runOnUiThread {
+                    if (adminExists) {
+                        // Block public registration completely
+                        showRegistrationBlockedMessage()
+                        return@runOnUiThread
+                    } else {
+                        // First-time setup: Creating admin account
+                        Toast.makeText(this@RegisterActivity, 
+                            "Welcome! Please create the initial administrator account to set up your system.", 
+                            Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        } else {
+            // Internal access from admin: Still creating admin accounts
+            Toast.makeText(this, "Creating new administrator account", Toast.LENGTH_SHORT).show()
+        }
+        
         setupClickListeners()
     }
     
-    private fun setupRoleDropdown() {
-        val roles = arrayOf("STAFF", "MANAGER", "ADMIN")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, roles)
-        binding.actvRole.setAdapter(adapter)
-        binding.actvRole.setText("STAFF", false) // Default to STAFF
+    private fun showRegistrationBlockedMessage() {
+        // Hide all form elements and show message
+        binding.tilFullName.isEnabled = false
+        binding.tilUsername.isEnabled = false
+        binding.tilEmail.isEnabled = false
+        binding.tilPassword.isEnabled = false
+        binding.tilConfirmPassword.isEnabled = false
+        binding.btnRegister.isEnabled = false
+        
+        // Set opacity to show they're disabled
+        binding.tilFullName.alpha = 0.5f
+        binding.tilUsername.alpha = 0.5f
+        binding.tilEmail.alpha = 0.5f
+        binding.tilPassword.alpha = 0.5f
+        binding.tilConfirmPassword.alpha = 0.5f
+        binding.btnRegister.alpha = 0.5f
+        
+        Toast.makeText(this, 
+            "Registration is disabled. The system has been initialized. Contact your administrator to create new accounts.", 
+            Toast.LENGTH_LONG).show()
     }
-    
+
     private fun setupClickListeners() {
         binding.btnRegister.setOnClickListener {
             attemptRegistration()
@@ -79,11 +116,12 @@ class RegisterActivity : AppCompatActivity() {
     }
     
     private fun checkAdminPrivileges() {
+        // Registration is only for admin accounts now
         val currentUserRole = LoginActivity.getCurrentUserRole(this)
         if (currentUserRole != "ADMIN" && LoginActivity.getCurrentUserId(this) != -1) {
-            // If not admin and logged in, restrict role selection
-            binding.actvRole.isEnabled = false
-            binding.actvRole.setText("STAFF", false)
+            // If not admin and logged in, show error and finish
+            Toast.makeText(this, "Only administrators can create new accounts", Toast.LENGTH_LONG).show()
+            finish()
         }
     }
     
@@ -93,10 +131,9 @@ class RegisterActivity : AppCompatActivity() {
         val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString()
         val confirmPassword = binding.etConfirmPassword.text.toString()
-        val role = binding.actvRole.text.toString()
         
-        if (validateInput(fullName, username, email, password, confirmPassword, role)) {
-            performRegistration(fullName, username, email, password, role)
+        if (validateInput(fullName, username, email, password, confirmPassword)) {
+            performRegistration(fullName, username, email, password, "ADMIN")
         }
     }
     
@@ -105,8 +142,7 @@ class RegisterActivity : AppCompatActivity() {
         username: String,
         email: String,
         password: String,
-        confirmPassword: String,
-        role: String
+        confirmPassword: String
     ): Boolean {
         var isValid = true
         
@@ -165,14 +201,6 @@ class RegisterActivity : AppCompatActivity() {
             binding.tilConfirmPassword.error = null
         }
         
-        // Role validation
-        if (TextUtils.isEmpty(role) || !arrayOf("STAFF", "MANAGER", "ADMIN").contains(role)) {
-            binding.tilRole.error = "Please select a valid role"
-            isValid = false
-        } else {
-            binding.tilRole.error = null
-        }
-        
         return isValid
     }
     
@@ -185,6 +213,34 @@ class RegisterActivity : AppCompatActivity() {
     ) {
         lifecycleScope.launch {
             try {
+                val isPublicAccess = LoginActivity.getCurrentUserId(this@RegisterActivity) == -1
+                val adminExists = checkIfAdminExists()
+                
+                // Enhanced security checks
+                if (isPublicAccess && adminExists) {
+                    // Block all public registration once admin exists
+                    Toast.makeText(this@RegisterActivity, 
+                        "Public registration is disabled. Contact your administrator to create new accounts.", 
+                        Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                
+                if (isPublicAccess && !adminExists && role != RoleManager.ROLE_ADMIN) {
+                    // First-time setup must be admin
+                    Toast.makeText(this@RegisterActivity, 
+                        "Initial setup requires administrator account creation.", 
+                        Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                
+                if (role == RoleManager.ROLE_ADMIN && adminExists && isPublicAccess) {
+                    // Prevent public admin registration if admin already exists
+                    Toast.makeText(this@RegisterActivity, 
+                        "Admin registration not allowed. Contact existing administrator.", 
+                        Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                
                 // Check if username already exists
                 val existingUser = database.userDao().getUserByUsername(username)
                 if (existingUser != null) {
@@ -225,6 +281,15 @@ class RegisterActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(this@RegisterActivity, "Registration failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+    
+    private suspend fun checkIfAdminExists(): Boolean {
+        return try {
+            val users = database.userDao().getAllUsersOnce()
+            users.any { it.role == RoleManager.ROLE_ADMIN && it.isActive }
+        } catch (e: Exception) {
+            false
         }
     }
 }

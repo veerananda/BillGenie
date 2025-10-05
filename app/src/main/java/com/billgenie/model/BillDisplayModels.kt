@@ -5,6 +5,7 @@ data class BillItemDisplay(
     val id: Long = 0,
     val menuItemId: Long,
     val itemName: String,
+    val categoryName: String = "General", // Default value for backward compatibility
     val itemPrice: Double,
     val quantity: Int,
     val totalPrice: Double = itemPrice * quantity

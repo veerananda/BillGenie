@@ -149,30 +149,12 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Role Selection -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilRole"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:hint="Role">
-
-                    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
-                        android:id="@+id/actvRole"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"
-                        android:text="ADMIN" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
                 <!-- Register Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRegister"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Create Account"
+                    android:text="Create Admin Account"
                     android:textSize="16sp"
                     android:layout_marginBottom="16dp" />
 

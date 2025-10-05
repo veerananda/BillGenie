@@ -12,8 +12,16 @@ import com.billgenie.R
 import com.billgenie.model.MenuItem
 
 class OrderMenuItemAdapter(
-    private val onAddToOrder: (MenuItem, Int) -> Unit
+    private val onAddToOrder: (MenuItem, Int) -> Unit,
+    private val getCurrentQuantity: (Long) -> Int = { 0 } // Function to get current quantity for menu item ID
 ) : ListAdapter<MenuItem, OrderMenuItemAdapter.MenuItemViewHolder>(MenuItemDiffCallback()) {
+
+    private val sessionQuantities = mutableMapOf<Long, Int>() // Track session quantities per item
+
+    fun resetSessionQuantities() {
+        sessionQuantities.clear()
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuItemViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -40,23 +48,26 @@ class OrderMenuItemAdapter(
             tvItemName.text = menuItem.name
             tvItemPrice.text = "₹${String.format("%.2f", menuItem.price)}"
             
-            currentQuantity = 0
+            // Get session quantity for this item (how many added from menu in this session)
+            currentQuantity = sessionQuantities[menuItem.id] ?: 0
             updateQuantityDisplay()
 
             btnMinus.setOnClickListener {
                 if (currentQuantity > 0) {
                     currentQuantity--
+                    sessionQuantities[menuItem.id] = currentQuantity
                     updateQuantityDisplay()
-                    // Automatically update order when quantity changes
-                    onAddToOrder(menuItem, currentQuantity)
+                    // Remove 1 from order
+                    onAddToOrder(menuItem, -1)
                 }
             }
 
             btnPlus.setOnClickListener {
                 currentQuantity++
+                sessionQuantities[menuItem.id] = currentQuantity
                 updateQuantityDisplay()
-                // Automatically add/update item in order when quantity increases
-                onAddToOrder(menuItem, currentQuantity)
+                // Add 1 to order immediately
+                onAddToOrder(menuItem, 1)
             }
         }
 

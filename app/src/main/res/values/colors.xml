@@ -44,4 +44,8 @@
     <color name="warning_color">#FFFF9800</color>
     <color name="green">#FF4CAF50</color>
     <color name="red">#FFF44336</color>
+    
+    <!-- Status Text Colors -->
+    <color name="status_active_text">#2E7D32</color>
+    <color name="status_inactive_text">#F57C00</color>
 </resources>

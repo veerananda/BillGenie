@@ -50,21 +50,6 @@
             android:parentActivityName=".MainActivity" />
             
         <activity
-            android:name=".MenuManagementActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-            
-        <activity
-            android:name=".SimpleMenuActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-            
-        <activity
-            android:name=".TestMenuActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-            
-        <activity
             android:name=".BillGenerationActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
@@ -103,6 +88,11 @@
             android:name=".IngredientManagementActivity"
             android:exported="false"
             android:parentActivityName=".FlavourSelectionActivity" />
+            
+        <activity
+            android:name=".UserManagementActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
             
         <!-- Keep old BillActivity for backwards compatibility -->
         <activity

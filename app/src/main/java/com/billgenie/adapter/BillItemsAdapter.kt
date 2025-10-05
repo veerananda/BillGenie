@@ -36,7 +36,8 @@ class BillItemsAdapter(
         private val btnRemoveItem: MaterialButton = itemView.findViewById(R.id.btnRemoveItem)
 
         fun bind(billItem: BillItemDisplay) {
-            tvBillItemName.text = billItem.itemName
+            // Display item name with category at the end (e.g., "Pulled Chicken Burger")
+            tvBillItemName.text = "${billItem.itemName} ${billItem.categoryName}"
             tvBillItemPrice.text = "₹${String.format("%.2f", billItem.itemPrice)}"
             tvBillItemQuantity.text = billItem.quantity.toString()
             tvBillItemTotal.text = "₹${String.format("%.2f", billItem.totalPrice)}"

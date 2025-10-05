@@ -6,23 +6,34 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.billgenie.adapter.UserManagementAdapter
 import com.billgenie.database.BillGenieDatabase
 import com.billgenie.databinding.ActivityMainBinding
+import com.billgenie.model.User
 import com.billgenie.utils.MonthlyBackupManager
 import com.billgenie.utils.BackupReminderManager
 import com.billgenie.utils.RoleManager
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
+    private lateinit var database: BillGenieDatabase
     private lateinit var backupManager: MonthlyBackupManager
     private lateinit var reminderManager: BackupReminderManager
     private val NOTIFICATION_PERMISSION_CODE = 1002
@@ -107,8 +118,7 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun initializeDatabase() {
-        // Database will be created automatically when first accessed
-        // No complex initialization needed for simplified menu system
+        database = BillGenieDatabase.getDatabase(this)
     }
     
     private fun applyRoleBasedRestrictions() {
@@ -569,30 +579,274 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun showUserManagement() {
-        val userOptions = arrayOf(
-            "➕ Register New User",
-            "👥 View All Users"
-        )
-        
-        MaterialAlertDialogBuilder(this)
-            .setTitle("User Management")
-            .setItems(userOptions) { _, which ->
-                when (which) {
-                    0 -> {
-                        // Open RegisterActivity
-                        val intent = Intent(this, RegisterActivity::class.java)
-                        startActivity(intent)
-                    }
-                    1 -> showAllUsers()
-                }
-            }
-            .setNegativeButton("Back", null)
-            .show()
+        // Navigate to the new UserManagementActivity
+        val intent = Intent(this, UserManagementActivity::class.java)
+        startActivity(intent)
+    }
+    
+    private fun getCurrentUser(users: List<User>): User? {
+        val currentUsername = getSharedPreferences("user_session", MODE_PRIVATE)
+            .getString("username", null)
+        android.util.Log.d("UserManagement", "Current username from session: $currentUsername")
+        val foundUser = users.find { it.username == currentUsername }
+        android.util.Log.d("UserManagement", "Found current user: ${foundUser?.fullName} (${foundUser?.role})")
+        return foundUser
     }
     
     private fun showAllUsers() {
-        // This could be enhanced to show a list of all users
-        Toast.makeText(this, "User list feature coming soon!", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            try {
+                // Get all users from database (both active and inactive)
+                val users = database.userDao().getAllUsersOnce()
+                android.util.Log.d("UserManagement", "Retrieved ${users.size} users from database")
+                runOnUiThread {
+                    showUserListDialog(users)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("UserManagement", "Error loading users", e)
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "Error loading users: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    private fun showUserListDialog(users: List<User>) {
+        android.util.Log.d("UserManagement", "showUserListDialog called with ${users.size} users")
+        val dialogView = layoutInflater.inflate(R.layout.dialog_user_list, null)
+        val rvUsers = dialogView.findViewById<RecyclerView>(R.id.rvUsers)
+        val tvUserCount = dialogView.findViewById<TextView>(R.id.tvUserCount)
+        val llEmptyState = dialogView.findViewById<LinearLayout>(R.id.llEmptyState)
+        val btnRefresh = dialogView.findViewById<Button>(R.id.btnRefresh)
+        val btnAddUser = dialogView.findViewById<Button>(R.id.btnAddUser)
+        val btnClose = dialogView.findViewById<Button>(R.id.btnClose)
+        
+        // Get current user
+        val currentUser = getCurrentUser(users)
+        
+        // Setup RecyclerView
+        rvUsers.layoutManager = LinearLayoutManager(this)
+        val adapter = UserManagementAdapter(
+            users = users,
+            currentUser = currentUser ?: users.first(), // Fallback to first user if current user not found
+            onToggleStatusClick = { user -> handleToggleUserStatus(user) },
+            onEditUserClick = { user -> handleEditUser(user) },
+            onDeleteUserClick = { user -> handleDeleteUser(user) }
+        )
+        rvUsers.adapter = adapter
+        
+        // Update UI based on user count
+        if (users.isEmpty()) {
+            rvUsers.visibility = View.GONE
+            llEmptyState.visibility = View.VISIBLE
+            tvUserCount.text = "0 users"
+        } else {
+            rvUsers.visibility = View.VISIBLE
+            llEmptyState.visibility = View.GONE
+            tvUserCount.text = "${users.size} user${if (users.size != 1) "s" else ""}"
+        }
+        
+        // Create dialog
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+        
+        // Setup button listeners
+        btnRefresh.setOnClickListener {
+            dialog.dismiss()
+            showAllUsers() // Refresh the list
+        }
+        
+        btnAddUser.setOnClickListener {
+            dialog.dismiss()
+            // Open RegisterActivity
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+        
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+        
+        // Make dialog larger
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+    
+    private fun handleToggleUserStatus(user: User) {
+        val action = if (user.isActive) "deactivate" else "activate"
+        val title = if (user.isActive) "Deactivate User" else "Activate User"
+        val message = "Are you sure you want to $action ${user.fullName} (@${user.username})?"
+        
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(action.replaceFirstChar { it.uppercase() }) { _, _ ->
+                lifecycleScope.launch {
+                    try {
+                        if (user.isActive) {
+                            // Prevent deactivating the current user
+                            val currentUsername = getSharedPreferences("user_session", MODE_PRIVATE)
+                                .getString("username", "")
+                            if (user.username == currentUsername) {
+                                runOnUiThread {
+                                    Toast.makeText(this@MainActivity, "Cannot deactivate your own account", Toast.LENGTH_SHORT).show()
+                                }
+                                return@launch
+                            }
+                            
+                            database.userDao().deactivateUser(user.id)
+                        } else {
+                            // Reactivate user by updating isActive = true
+                            val updatedUser = user.copy(isActive = true)
+                            database.userDao().updateUser(updatedUser)
+                        }
+                        
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, "User ${action}d successfully", Toast.LENGTH_SHORT).show()
+                            showAllUsers() // Refresh the list
+                        }
+                    } catch (e: Exception) {
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun handleEditUser(user: User) {
+        val roleOptions = arrayOf("ADMIN", "MANAGER", "STAFF")
+        var selectedRole = user.role
+        var selectedRoleIndex = roleOptions.indexOf(user.role).takeIf { it >= 0 } ?: 0
+        
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Edit User: ${user.fullName}")
+            .setSingleChoiceItems(roleOptions, selectedRoleIndex) { _, which ->
+                selectedRole = roleOptions[which]
+                selectedRoleIndex = which
+            }
+            .setPositiveButton("Update Role") { _, _ ->
+                if (selectedRole != user.role) {
+                    updateUserRole(user, selectedRole)
+                } else {
+                    Toast.makeText(this, "No changes made", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNeutralButton("View Details") { _, _ ->
+                showUserDetails(user)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun updateUserRole(user: User, newRole: String) {
+        // Prevent changing own role from ADMIN
+        val currentUsername = getSharedPreferences("user_session", MODE_PRIVATE)
+            .getString("username", "")
+        
+        if (user.username == currentUsername && user.role == RoleManager.ROLE_ADMIN && newRole != RoleManager.ROLE_ADMIN) {
+            Toast.makeText(this, "Cannot remove admin privileges from your own account", Toast.LENGTH_LONG).show()
+            return
+        }
+        
+        lifecycleScope.launch {
+            try {
+                val updatedUser = user.copy(role = newRole)
+                database.userDao().updateUser(updatedUser)
+                
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "User role updated to $newRole", Toast.LENGTH_SHORT).show()
+                    showAllUsers() // Refresh the list
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "Error updating role: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    private fun showUserDetails(user: User) {
+        val details = buildString {
+            append("👤 Full Name: ${user.fullName}\n\n")
+            append("🏷️ Username: @${user.username}\n\n")
+            append("📧 Email: ${user.email ?: "Not provided"}\n\n")
+            append("👔 Role: ${user.role}\n\n")
+            append("🟢 Status: ${if (user.isActive) "Active" else "Inactive"}\n\n")
+            append("📅 Created: ${java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(user.createdAt)}\n\n")
+            if (user.lastLoginAt != null) {
+                append("🕐 Last Login: ${java.text.SimpleDateFormat("MMM dd, yyyy HH:mm", java.util.Locale.getDefault()).format(user.lastLoginAt)}")
+            } else {
+                append("🕐 Last Login: Never")
+            }
+        }
+        
+        MaterialAlertDialogBuilder(this)
+            .setTitle("User Details")
+            .setMessage(details)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+    
+    private fun handleDeleteUser(user: User) {
+        // Double-check permissions
+        val currentUserRole = RoleManager.getCurrentUserRole(this)
+        if (currentUserRole != RoleManager.ROLE_ADMIN) {
+            Toast.makeText(this, "Only administrators can delete users", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Prevent self-deletion
+        val currentUsername = getSharedPreferences("user_session", MODE_PRIVATE)
+            .getString("username", "")
+        if (user.username == currentUsername) {
+            Toast.makeText(this, "Cannot delete your own account", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        val deleteMessage = "⚠️ WARNING: This action cannot be undone!\n\n" +
+                "Are you sure you want to permanently delete user:\n\n" +
+                "👤 ${user.fullName} (@${user.username})\n" +
+                "👔 Role: ${user.role}\n\n" +
+                "All user data will be permanently removed from the system."
+        
+        MaterialAlertDialogBuilder(this)
+            .setTitle("🗑️ Delete User")
+            .setMessage(deleteMessage)
+            .setPositiveButton("Delete") { _, _ ->
+                performUserDeletion(user)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun performUserDeletion(user: User) {
+        lifecycleScope.launch {
+            try {
+                database.userDao().deleteUserById(user.id)
+                
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, 
+                        "User ${user.fullName} has been permanently deleted", 
+                        Toast.LENGTH_LONG).show()
+                    showAllUsers() // Refresh the list
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, 
+                        "Error deleting user: ${e.message}", 
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
     
     private fun clearAllNotifications() {

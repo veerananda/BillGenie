@@ -44,6 +44,8 @@ class TakeOrderActivity : AppCompatActivity() {
     private var isOrderSaved = false
     private var lastSavedTotal = 0.0  // Track the total when last saved
     private var lastSavedItemCount = 0  // Track item count when last saved
+    private var lastSavedOrderSnapshot = mutableListOf<BillItemDisplay>()  // Track exact items when last saved
+    private var currentMenuAdapter: OrderMenuItemAdapter? = null  // Reference to current menu adapter
     
     // Rupee formatter
     private val rupeeFormatter = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
@@ -114,12 +116,26 @@ class TakeOrderActivity : AppCompatActivity() {
                         
                         // Load existing items into the bill
                         billItems.clear()
-                        billItems.addAll(existingOrder.orderItems)
+                        
+                        // Handle backward compatibility: populate missing category names
+                        val menuItemDao = database.menuItemDao()
+                        val updatedOrderItems = existingOrder.orderItems.map { billItem ->
+                            if (billItem.categoryName.isEmpty()) {
+                                // This is an old order item without category, look up the category
+                                val menuItem = menuItemDao.getMenuItemById(billItem.menuItemId)
+                                billItem.copy(categoryName = menuItem?.category ?: "General")
+                            } else {
+                                billItem
+                            }
+                        }
+                        
+                        billItems.addAll(updatedOrderItems)
                         
                         // Mark as saved since this is an existing order from database
                         isOrderSaved = true
                         lastSavedTotal = existingOrder.total
                         lastSavedItemCount = existingOrder.orderItems.sumOf { it.quantity }
+                        lastSavedOrderSnapshot = billItems.map { it.copy() }.toMutableList()  // Deep copy of current state
                         
                         // Update UI on main thread
                         runOnUiThread {
@@ -154,9 +170,18 @@ class TakeOrderActivity : AppCompatActivity() {
         
         tvCategoryName.text = category.name
         
-        val menuItemAdapter = OrderMenuItemAdapter { menuItem, quantity ->
-            addMenuItemToOrder(menuItem, quantity)
-        }
+        val menuItemAdapter = OrderMenuItemAdapter(
+            onAddToOrder = { menuItem, quantity ->
+                addMenuItemToOrder(menuItem, quantity)
+            },
+            getCurrentQuantity = { menuItemId ->
+                // Return current quantity from billItems for this menu item
+                billItems.find { it.menuItemId == menuItemId }?.quantity ?: 0
+            }
+        )
+        
+        // Store reference to current menu adapter
+        currentMenuAdapter = menuItemAdapter
         
         recyclerViewMenuItems.apply {
             layoutManager = LinearLayoutManager(this@TakeOrderActivity)
@@ -201,29 +226,42 @@ class TakeOrderActivity : AppCompatActivity() {
     }
     
     private fun addMenuItemToOrder(menuItem: MenuItem, quantity: Int) {
-        val existingItem = billItems.find { it.menuItemId == menuItem.id }
+        // Try to find existing item by ID first, then by name as fallback
+        var existingItem = billItems.find { it.menuItemId == menuItem.id }
+        if (existingItem == null) {
+            // Fallback: try to find by name in case of ID mismatch
+            existingItem = billItems.find { it.itemName == menuItem.name }
+        }
         
-        if (quantity <= 0) {
-            // Remove item if quantity is 0 or less
-            if (existingItem != null) {
+        if (existingItem != null) {
+            // Add to existing item quantity (can be positive or negative)
+            val newQuantity = existingItem.quantity + quantity
+            
+            if (newQuantity <= 0) {
+                // Remove item if final quantity is 0 or less
                 billItems.remove(existingItem)
                 billItemsAdapter.submitList(billItems.toList())
                 Toast.makeText(this, "${menuItem.name} removed from order", Toast.LENGTH_SHORT).show()
+            } else {
+                // Update with new quantity
+                val updatedItem = existingItem.copy(
+                    menuItemId = menuItem.id, // Ensure ID is correct
+                    categoryName = menuItem.category, // Ensure category is correct
+                    quantity = newQuantity,
+                    totalPrice = menuItem.price * newQuantity
+                )
+                val index = billItems.indexOf(existingItem)
+                billItems[index] = updatedItem
+                billItemsAdapter.submitList(billItems.toList())
+                val action = if (quantity > 0) "increased" else "decreased"
+                Toast.makeText(this, "${menuItem.name} quantity $action to $newQuantity", Toast.LENGTH_SHORT).show()
             }
-        } else if (existingItem != null) {
-            // Update existing item quantity
-            val updatedItem = existingItem.copy(
-                quantity = quantity,
-                totalPrice = menuItem.price * quantity
-            )
-            val index = billItems.indexOf(existingItem)
-            billItems[index] = updatedItem
-            billItemsAdapter.submitList(billItems.toList())
-        } else {
+        } else if (quantity > 0) {
             // Add new item
             val billItem = BillItemDisplay(
                 menuItemId = menuItem.id,
                 itemName = menuItem.name,
+                categoryName = menuItem.category,
                 quantity = quantity,
                 itemPrice = menuItem.price,
                 totalPrice = menuItem.price * quantity
@@ -333,6 +371,9 @@ class TakeOrderActivity : AppCompatActivity() {
             billItems[index] = updatedItem
             billItemsAdapter.submitList(billItems.toList())
             updateBillTotal()
+            
+            // Reset menu category session quantities since order was modified from current order
+            currentMenuAdapter?.resetSessionQuantities()
         }
     }
     
@@ -343,6 +384,9 @@ class TakeOrderActivity : AppCompatActivity() {
             billItemsAdapter.submitList(billItems.toList())
             updateBillTotal()
             Toast.makeText(this, "${billItem.itemName} removed from order", Toast.LENGTH_SHORT).show()
+            
+            // Reset menu category session quantities since order was modified from current order
+            currentMenuAdapter?.resetSessionQuantities()
         }
     }
     
@@ -353,30 +397,25 @@ class TakeOrderActivity : AppCompatActivity() {
         val totalItems = billItems.sumOf { it.quantity }
         binding.tvOrderItemsCount.text = "$totalItems item${if (totalItems != 1) "s" else ""}"
         
-        // Check if order has been modified after saving
-        val hasUnsavedChanges = isOrderSaved && 
-            (currentBillTotal != lastSavedTotal || totalItems != lastSavedItemCount)
+        // Check if current order matches the last saved state (for edit mode)
+        val currentMatchesSaved = isOrderSaved && ordersAreIdentical(billItems, lastSavedOrderSnapshot)
         
         // Update button states based on order status and changes
-        if (isOrderSaved && !hasUnsavedChanges) {
-            // Order is saved and no changes - show "Order Saved" disabled button
+        if (currentMatchesSaved) {
+            // Order matches saved state - show "Order Saved" disabled button
             binding.btnSaveOrder.visibility = android.view.View.VISIBLE
             binding.btnSaveOrder.text = "Order Saved"
             binding.btnSaveOrder.isEnabled = false
             binding.btnSaveOrder.icon = androidx.core.content.ContextCompat.getDrawable(this, android.R.drawable.ic_menu_agenda)
             binding.btnCheckout.visibility = android.view.View.GONE
         } else {
-            // Order not saved yet OR has unsaved changes - show active Save Order button
+            // Order doesn't match saved state OR is new - show active Save Order button
+            val hasUnsavedChanges = isOrderSaved && !currentMatchesSaved
             binding.btnSaveOrder.visibility = android.view.View.VISIBLE
             binding.btnSaveOrder.text = if (hasUnsavedChanges) "Save Changes" else "Save Order"
             binding.btnSaveOrder.isEnabled = billItems.isNotEmpty()
             binding.btnSaveOrder.icon = androidx.core.content.ContextCompat.getDrawable(this, android.R.drawable.ic_menu_save)
             binding.btnCheckout.visibility = android.view.View.GONE
-            
-            // Reset saved state if there are unsaved changes
-            if (hasUnsavedChanges) {
-                isOrderSaved = false
-            }
         }
         
         if (billItems.isEmpty()) {
@@ -488,6 +527,7 @@ class TakeOrderActivity : AppCompatActivity() {
                 isOrderSaved = true
                 lastSavedTotal = currentBillTotal  // Record the saved total
                 lastSavedItemCount = billItems.sumOf { it.quantity }  // Record the saved item count
+                lastSavedOrderSnapshot = billItems.map { it.copy() }.toMutableList()  // Snapshot current state
                 updateBillTotal()
                 
                 val action = if (existingOrder != null) "updated" else "saved"
@@ -597,5 +637,18 @@ class TakeOrderActivity : AppCompatActivity() {
     private fun saveOrderForLater() {
         // TODO: Implement order saving to shared preferences or database
         Toast.makeText(this, "Order saved for Customer $customerNumber", Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * Compare two lists of BillItemDisplay to see if they represent the same order
+     */
+    private fun ordersAreIdentical(current: List<BillItemDisplay>, saved: List<BillItemDisplay>): Boolean {
+        if (current.size != saved.size) return false
+        
+        // Create maps of menuItemId to quantity for comparison
+        val currentMap = current.groupBy { it.menuItemId }.mapValues { it.value.sumOf { item -> item.quantity } }
+        val savedMap = saved.groupBy { it.menuItemId }.mapValues { it.value.sumOf { item -> item.quantity } }
+        
+        return currentMap == savedMap
     }
 }
