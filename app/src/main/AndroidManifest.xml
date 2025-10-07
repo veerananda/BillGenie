@@ -64,11 +64,7 @@
             android:exported="false"
             android:parentActivityName=".BillGenerationActivity" />
             
-        <activity
-            android:name=".SimpleCategoryActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-            
+
         <activity
             android:name=".MenuIngredientsActivity"
             android:exported="false"
@@ -88,6 +84,26 @@
             android:name=".IngredientManagementActivity"
             android:exported="false"
             android:parentActivityName=".FlavourSelectionActivity" />
+            
+        <activity
+            android:name=".IngredientsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+            
+        <activity
+            android:name=".InventoryActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+            
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false"
+            android:parentActivityName=".OrdersBillingActivity" />
+            
+        <activity
+            android:name=".FinalBillActivity"
+            android:exported="false"
+            android:parentActivityName=".CheckoutActivity" />
             
         <activity
             android:name=".UserManagementActivity"

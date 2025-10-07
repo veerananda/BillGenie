@@ -10,6 +10,9 @@ interface MenuCategoryDao {
     @Query("SELECT * FROM menu_categories WHERE isActive = 1 ORDER BY name ASC")
     fun getAllActiveCategories(): Flow<List<MenuCategory>>
     
+    @Query("SELECT * FROM menu_categories WHERE isActive = 1 ORDER BY name ASC")
+    suspend fun getAllActiveCategoriesSync(): List<MenuCategory>
+    
     @Query("SELECT * FROM menu_categories ORDER BY name ASC")
     fun getAllCategories(): Flow<List<MenuCategory>>
     

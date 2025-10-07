@@ -1,5 +1,7 @@
 package com.billgenie.model
 
+import java.io.Serializable
+
 // Data class for displaying bill items in RecyclerView
 data class BillItemDisplay(
     val id: Long = 0,
@@ -9,7 +11,7 @@ data class BillItemDisplay(
     val itemPrice: Double,
     val quantity: Int,
     val totalPrice: Double = itemPrice * quantity
-)
+) : Serializable
 
 // Data class for bill summary
 data class BillSummary(
@@ -18,4 +20,4 @@ data class BillSummary(
     val items: List<BillItemDisplay>,
     val totalAmount: Double,
     val dateCreated: String
-)
+) : Serializable

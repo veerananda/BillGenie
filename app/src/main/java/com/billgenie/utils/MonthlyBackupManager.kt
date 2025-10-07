@@ -264,6 +264,9 @@ class MonthlyBackupManager(
         val currentYear = calendar.get(Calendar.YEAR)
         val currentMonth = calendar.get(Calendar.MONTH) + 1
         
+        // Create month string in format "yyyy-MM"
+        val monthString = String.format("%04d-%02d", currentYear, currentMonth)
+        
         // Create month start date
         calendar.set(currentYear, currentMonth - 1, 1, 0, 0, 0)
         val monthStart = dateFormat.format(calendar.time)
@@ -271,9 +274,10 @@ class MonthlyBackupManager(
         // Current date
         val today = dateFormat.format(Date())
         
-        val bills = database.billDao().getBillsByDateRange(monthStart, "$today 23:59:59")
-        val totalSales = bills.sumOf { it.totalAmount }
-        val billCount = bills.size
+        // Query sales_records table instead of bills table
+        val salesRecords = database.salesDao().getSalesByMonth(monthString)
+        val totalSales = salesRecords.sumOf { it.finalTotal }
+        val billCount = salesRecords.size
         
         return@withContext SalesData(
             totalAmount = totalSales,
@@ -289,12 +293,11 @@ class MonthlyBackupManager(
      */
     suspend fun getCurrentDaySales(): SalesData = withContext(Dispatchers.IO) {
         val today = dateFormat.format(Date())
-        val todayStart = "$today 00:00:00"
-        val todayEnd = "$today 23:59:59"
         
-        val bills = database.billDao().getBillsByDateRange(todayStart, todayEnd)
-        val totalSales = bills.sumOf { it.totalAmount }
-        val billCount = bills.size
+        // Query sales_records table instead of bills table
+        val salesRecords = database.salesDao().getSalesByDate(today)
+        val totalSales = salesRecords.sumOf { it.finalTotal }
+        val billCount = salesRecords.size
         
         return@withContext SalesData(
             totalAmount = totalSales,

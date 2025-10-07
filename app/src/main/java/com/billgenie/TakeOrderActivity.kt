@@ -19,6 +19,7 @@ import com.billgenie.adapter.OrderMenuItemAdapter
 import com.billgenie.database.BillGenieDatabase
 import com.billgenie.databinding.ActivityTakeOrderBinding
 import com.billgenie.model.BillItemDisplay
+import com.billgenie.utils.DelayedInventoryManager
 import com.billgenie.model.CustomerOrder
 import com.billgenie.model.OrderStatus
 import com.billgenie.model.MenuCategory
@@ -35,6 +36,7 @@ class TakeOrderActivity : AppCompatActivity() {
     private lateinit var orderCategoryAdapter: OrderCategoryAdapter
     private lateinit var billItemsAdapter: BillItemsAdapter
     private lateinit var database: BillGenieDatabase
+    // private lateinit var inventoryDeductionManager: InventoryDeductionManager // Temporarily disabled
     
     private val billItems = mutableListOf<BillItemDisplay>()
     private var currentBillTotal = 0.0
@@ -69,6 +71,7 @@ class TakeOrderActivity : AppCompatActivity() {
         
         setupToolbar()
         setupDatabase()
+        setupInventoryManager() // Re-enabled but commented out inside
         setupRecyclerViews()
         setupClickListeners()
         loadCategories()
@@ -101,6 +104,11 @@ class TakeOrderActivity : AppCompatActivity() {
     
     private fun setupDatabase() {
         database = BillGenieDatabase.getDatabase(this)
+    }
+    
+    private fun setupInventoryManager() {
+        // Temporarily disabled to fix ANR issue
+        // inventoryDeductionManager = InventoryDeductionManager(this, database)
     }
     
     private fun loadExistingOrderIfEditing() {
@@ -523,6 +531,20 @@ class TakeOrderActivity : AppCompatActivity() {
                 
                 android.util.Log.d("TakeOrderActivity", "Order saved to database for customer $customerNumber")
                 
+                // Schedule inventory deductions for 5 minutes later
+                try {
+                    val delayedInventoryManager = DelayedInventoryManager(this@TakeOrderActivity)
+                    val deductionScheduled = delayedInventoryManager.scheduleDelayedInventoryDeduction(customerOrder)
+                    if (deductionScheduled) {
+                        android.util.Log.d("TakeOrderActivity", "Inventory deductions scheduled for customer $customerNumber to run in 5 minutes")
+                    } else {
+                        android.util.Log.w("TakeOrderActivity", "Failed to schedule inventory deductions for customer $customerNumber, but order was saved")
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("TakeOrderActivity", "Error scheduling inventory deductions", e)
+                    // Don't fail the order save if inventory scheduling fails
+                }
+                
                 // Mark order as saved in memory for this session
                 isOrderSaved = true
                 lastSavedTotal = currentBillTotal  // Record the saved total
@@ -531,7 +553,7 @@ class TakeOrderActivity : AppCompatActivity() {
                 updateBillTotal()
                 
                 val action = if (existingOrder != null) "updated" else "saved"
-                Toast.makeText(this@TakeOrderActivity, "Order $action for Customer $customerNumber! Items: ${billItems.size}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@TakeOrderActivity, "Order $action for Customer $customerNumber!", Toast.LENGTH_SHORT).show()
                 
             } catch (e: Exception) {
                 android.util.Log.e("TakeOrderActivity", "Error saving order to database", e)

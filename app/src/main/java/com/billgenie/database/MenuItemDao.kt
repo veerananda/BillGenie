@@ -18,6 +18,9 @@ interface MenuItemDao {
 
     @Query("SELECT * FROM menu_items WHERE id = :id")
     suspend fun getMenuItemById(id: Long): MenuItem?
+    
+    @Query("SELECT * FROM menu_items WHERE LOWER(name) = LOWER(:name) AND isActive = 1 LIMIT 1")
+    suspend fun getMenuItemByName(name: String): MenuItem?
 
     @Query("SELECT * FROM menu_items WHERE LOWER(name) = LOWER(:name) AND isActive = 1 AND id != :excludeId")
     suspend fun findDuplicateByName(name: String, excludeId: Long = -1): MenuItem?

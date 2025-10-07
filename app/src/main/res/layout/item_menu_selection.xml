@@ -15,51 +15,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="16dp"
         android:gravity="center_vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvMenuItemName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvMenuItemName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                tools:text="Margherita Pizza" />
-
-            <TextView
-                android:id="@+id/tvMenuItemCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/category_chip_background"
-                android:paddingStart="6dp"
-                android:paddingTop="1dp"
-                android:paddingEnd="6dp"
-                android:paddingBottom="1dp"
-                android:textSize="9sp"
-                android:textColor="@color/primary_color"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                tools:text="PIZZA" />
-
-            <TextView
-                android:id="@+id/tvMenuItemPrice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textSize="14sp"
-                android:textColor="@color/primary_color"
-                android:textStyle="bold"
-                tools:text="₹299.00" />
-
-        </LinearLayout>
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:textStyle="normal"
+            tools:text="Margherita Pizza" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSelectItem"

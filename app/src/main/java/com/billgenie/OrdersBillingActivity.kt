@@ -194,50 +194,10 @@ class OrdersBillingActivity : AppCompatActivity() {
     }
     
     private fun checkoutCustomerOrder(customerOrder: CustomerOrder) {
-        // Create a simple checkout dialog
-        val checkoutMessage = buildString {
-            appendLine("Checkout Order")
-            if (customerOrder.tableName.isNotEmpty()) {
-                appendLine("Table: ${customerOrder.tableName}")
-            }
-            if (customerOrder.customerName.isNotEmpty()) {
-                appendLine("Customer: ${customerOrder.customerName}")
-            }
-            appendLine("Total: ${rupeeFormatter.format(customerOrder.total)}")
-            appendLine()
-            appendLine("Proceed with checkout?")
-        }
-        
-        AlertDialog.Builder(this)
-            .setTitle("Checkout Order")
-            .setMessage(checkoutMessage)
-            .setPositiveButton("Checkout") { _, _ ->
-                processCheckout(customerOrder)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-    
-    private fun processCheckout(customerOrder: CustomerOrder) {
-        lifecycleScope.launch {
-            try {
-                // Update order status to completed
-                val updatedOrder = customerOrder.copy(status = OrderStatus.COMPLETED)
-                database.customerOrderDao().updateOrder(updatedOrder)
-                
-                // Remove from local list
-                customerOrders.remove(customerOrder)
-                
-                // Update UI
-                updateUI()
-                
-                Toast.makeText(this@OrdersBillingActivity, "Order checked out successfully!", Toast.LENGTH_SHORT).show()
-                
-            } catch (e: Exception) {
-                android.util.Log.e("OrdersBillingActivity", "Error during checkout: ${e.message}", e)
-                Toast.makeText(this@OrdersBillingActivity, "Error during checkout: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
+        // Launch the new CheckoutActivity instead of showing a simple dialog
+        val intent = Intent(this, CheckoutActivity::class.java)
+        intent.putExtra(CheckoutActivity.EXTRA_CUSTOMER_ORDER, customerOrder)
+        startActivity(intent)
     }
     
     override fun onResume() {

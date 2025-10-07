@@ -27,14 +27,10 @@ class MenuSelectionAdapter(
 
     inner class MenuSelectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvMenuItemName: TextView = itemView.findViewById(R.id.tvMenuItemName)
-        private val tvMenuItemCategory: TextView = itemView.findViewById(R.id.tvMenuItemCategory)
-        private val tvMenuItemPrice: TextView = itemView.findViewById(R.id.tvMenuItemPrice)
         private val btnSelectItem: MaterialButton = itemView.findViewById(R.id.btnSelectItem)
 
         fun bind(menuItem: MenuItem) {
             tvMenuItemName.text = menuItem.name
-            tvMenuItemCategory.text = menuItem.category.uppercase()
-            tvMenuItemPrice.text = "₹${String.format("%.2f", menuItem.price)}"
             
             btnSelectItem.setOnClickListener { onItemSelected(menuItem) }
             itemView.setOnClickListener { onItemSelected(menuItem) }

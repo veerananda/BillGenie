@@ -8,6 +8,9 @@ import com.billgenie.model.Bill
 interface BillDao {
     @Query("SELECT * FROM bills WHERE isActive = 1 ORDER BY dateCreated DESC")
     fun getAllBills(): LiveData<List<Bill>>
+    
+    @Query("SELECT * FROM bills WHERE isActive = 1 ORDER BY dateCreated DESC")
+    suspend fun getAllActiveBills(): List<Bill>
 
     @Query("SELECT * FROM bills WHERE id = :id")
     suspend fun getBillById(id: Long): Bill?
@@ -57,8 +60,4 @@ interface BillDao {
     
     @Query("SELECT COUNT(*) FROM bills WHERE dateCreated < :date")
     suspend fun getBillsCountBeforeDate(date: String): Int
-    
-    // Get all active bills for initial backup
-    @Query("SELECT * FROM bills WHERE isActive = 1 ORDER BY dateCreated DESC")
-    suspend fun getAllActiveBills(): List<Bill>
 }

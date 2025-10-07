@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         setupClickListeners()
         initializeDatabase()
         applyRoleBasedRestrictions()
-        checkBackupNeeded()
         handleNotificationIntent()
     }
     
@@ -84,6 +83,17 @@ class MainActivity : AppCompatActivity() {
             // Auto-open backup dialog
             performMonthlyBackup()
         }
+        
+        // Check if app was opened from stock alert notification
+        if (intent.getBooleanExtra("navigate_to_inventory", false)) {
+            // Clear the flag to prevent repeated processing
+            intent.removeExtra("navigate_to_inventory")
+            
+            // Auto-navigate to inventory page
+            val inventoryIntent = Intent(this, InventoryActivity::class.java)
+            inventoryIntent.putExtra("opened_from_notification", true)
+            startActivity(inventoryIntent)
+        }
     }
     
     private fun setupToolbar() {
@@ -105,6 +115,16 @@ class MainActivity : AppCompatActivity() {
         
         binding.cardMenuPricing.setOnClickListener {
             val intent = Intent(this, MenuPricingActivity::class.java)
+            startActivity(intent)
+        }
+        
+        binding.cardIngredients.setOnClickListener {
+            val intent = Intent(this, IngredientsActivity::class.java)
+            startActivity(intent)
+        }
+        
+        binding.cardInventory.setOnClickListener {
+            val intent = Intent(this, InventoryActivity::class.java)
             startActivity(intent)
         }
         
@@ -243,8 +263,8 @@ class MainActivity : AppCompatActivity() {
             "📊 Current Month Sales",
             "📈 Today's Sales", 
             "💾 Backup Since Last Time",
-            "� Last Backup Information",
-            "�🔔 Backup Reminders"
+            "ℹ️ Last Backup Information",
+            "🔔 Backup Reminders"
         )
         
         MaterialAlertDialogBuilder(this)
@@ -864,8 +884,8 @@ class MainActivity : AppCompatActivity() {
         val message = buildString {
             append("🍽️ BillGenie Restaurant Manager\n\n")
             append("📱 Version: 1.0\n")
-            append("�‍💻 Developed by: Nandu\n")
-            append("�📅 Built: September 2025\n\n")
+            append("👨‍💻 Developed by: Nandu\n")
+            append("📅 Built: September 2025\n\n")
             append("Features:\n")
             append("• Menu & pricing management\n")
             append("• Bill generation\n")

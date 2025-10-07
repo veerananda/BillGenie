@@ -33,7 +33,6 @@ class LoginActivity : AppCompatActivity() {
         
         setupClickListeners()
         checkRegistrationAvailability()
-        createDefaultAdminUser()
     }
     
     private fun setupClickListeners() {
@@ -67,6 +66,7 @@ class LoginActivity : AppCompatActivity() {
                 // On error, show register button (fail-safe)
                 runOnUiThread {
                     binding.tvRegister.visibility = android.view.View.VISIBLE
+                    binding.tvRegister.text = "Create Admin Account"
                 }
             }
         }
@@ -155,134 +155,7 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
     
-    private fun createDefaultAdminUser() {
-        lifecycleScope.launch {
-            try {
-                // Create admin user
-                val existingAdmin = database.userDao().getUserByUsername("admin")
-                if (existingAdmin == null) {
-                    val adminUser = User(
-                        username = "admin",
-                        password = "admin123", // Simple password for demo - in production, this should be hashed
-                        fullName = "Administrator",
-                        email = "admin@billgenie.com",
-                        role = "ADMIN",
-                        isActive = true,
-                        createdAt = Date(),
-                        lastLoginAt = null
-                    )
-                    database.userDao().insertUser(adminUser)
-                }
-                
-                // Create manager user for testing
-                val existingManager = database.userDao().getUserByUsername("manager")
-                if (existingManager == null) {
-                    val managerUser = User(
-                        username = "manager",
-                        password = "manager123",
-                        fullName = "Restaurant Manager",
-                        email = "manager@billgenie.com",
-                        role = "MANAGER",
-                        isActive = true,
-                        createdAt = Date(),
-                        lastLoginAt = null
-                    )
-                    database.userDao().insertUser(managerUser)
-                }
-                
-                // Create staff user for testing
-                val existingStaff = database.userDao().getUserByUsername("staff")
-                if (existingStaff == null) {
-                    val staffUser = User(
-                        username = "staff",
-                        password = "staff123",
-                        fullName = "Restaurant Staff",
-                        email = "staff@billgenie.com",
-                        role = "STAFF",
-                        isActive = true,
-                        createdAt = Date(),
-                        lastLoginAt = null
-                    )
-                    database.userDao().insertUser(staffUser)
-                }
-                
-                // Create sample menu items with different categories for testing ingredients
-                createSampleMenuItems()
-            } catch (e: Exception) {
-                // Silently handle - database might not be ready yet
-            }
-        }
-    }
-    
-    private suspend fun createSampleMenuItems() {
-        try {
-            val menuItemDao = database.menuItemDao()
-            
-            // Check if sample data already exists
-            if (menuItemDao.findDuplicateByName("Margherita Pizza") != null) {
-                return // Sample data already exists
-            }
-            
-            // Create sample menu items for different categories
-            val sampleItems = listOf(
-                com.billgenie.model.MenuItem(
-                    name = "Margherita Pizza",
-                    price = 12.99,
-                    category = "Pizza",
-                    description = "Classic tomato sauce, mozzarella, and fresh basil"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Pepperoni Pizza",
-                    price = 14.99,
-                    category = "Pizza",
-                    description = "Tomato sauce, mozzarella, and pepperoni"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Caesar Salad",
-                    price = 8.99,
-                    category = "Salads",
-                    description = "Romaine lettuce, croutons, parmesan, caesar dressing"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Greek Salad",
-                    price = 9.99,
-                    category = "Salads",
-                    description = "Mixed greens, feta, olives, tomatoes, cucumber"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Chicken Alfredo",
-                    price = 16.99,
-                    category = "Pasta",
-                    description = "Fettuccine with grilled chicken in creamy alfredo sauce"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Spaghetti Bolognese",
-                    price = 15.99,
-                    category = "Pasta",
-                    description = "Spaghetti with traditional meat sauce"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Grilled Salmon",
-                    price = 22.99,
-                    category = "Main Course",
-                    description = "Atlantic salmon with lemon herb seasoning"
-                ),
-                com.billgenie.model.MenuItem(
-                    name = "Chocolate Cake",
-                    price = 6.99,
-                    category = "Desserts",
-                    description = "Rich chocolate layer cake with chocolate frosting"
-                )
-            )
-            
-            // Insert sample menu items
-            sampleItems.forEach { menuItem ->
-                menuItemDao.insertMenuItem(menuItem)
-            }
-        } catch (e: Exception) {
-            // Silently handle any database errors during sample data creation
-        }
-    }
+
     
     companion object {
         fun getCurrentUserId(context: Context): Int {

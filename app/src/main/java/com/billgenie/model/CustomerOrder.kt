@@ -6,6 +6,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.Serializable
 import java.util.Date
 
 @Entity(tableName = "customer_orders")
@@ -19,7 +20,7 @@ data class CustomerOrder(
     val total: Double,
     val orderTimestamp: Long = System.currentTimeMillis(),
     val status: OrderStatus = OrderStatus.PENDING
-)
+) : Serializable
 
 enum class OrderStatus {
     PENDING,    // Order saved, waiting for checkout
