@@ -52,7 +52,8 @@ class MenuPricingActivity : AppCompatActivity() {
             onItemAddClick = { category -> addMenuItem(category) },
             onItemEditClick = { item -> editMenuItem(item) },
             onItemDeleteClick = { item -> deleteMenuItem(item) },
-            onItemVegStatusChange = { item, isVeg -> updateItemVegStatus(item, isVeg) }
+            onItemVegStatusChange = { item, isVeg -> updateItemVegStatus(item, isVeg) },
+            onItemEnabledStatusChange = { item, isEnabled -> updateItemEnabledStatus(item, isEnabled) }
         )
         binding.recyclerViewCategories.adapter = adapter
         binding.recyclerViewCategories.layoutManager = LinearLayoutManager(this)
@@ -218,7 +219,8 @@ class MenuPricingActivity : AppCompatActivity() {
                 price = price,
                 category = category.name,
                 isVegetarian = isVegetarian,
-                isActive = true
+                isActive = true,
+                isEnabled = true // New items are enabled by default
             )
             database.menuItemDao().insert(menuItem)
             Toast.makeText(this@MenuPricingActivity, "Menu item added successfully", Toast.LENGTH_SHORT).show()
@@ -302,6 +304,15 @@ class MenuPricingActivity : AppCompatActivity() {
             val updatedItem = item.copy(isVegetarian = isVegetarian)
             database.menuItemDao().update(updatedItem)
             // No need to show toast for this quick toggle
+        }
+    }
+    
+    private fun updateItemEnabledStatus(item: MenuItem, isEnabled: Boolean) {
+        lifecycleScope.launch {
+            database.menuItemDao().setMenuItemEnabled(item.id, isEnabled)
+            val message = if (isEnabled) "Item '${item.name}' enabled" else "Item '${item.name}' disabled"
+            Toast.makeText(this@MenuPricingActivity, message, Toast.LENGTH_SHORT).show()
+            adapter.notifyDataSetChanged() // Refresh to show visual changes
         }
     }
     

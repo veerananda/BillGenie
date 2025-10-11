@@ -120,9 +120,9 @@ class BillActivity : AppCompatActivity() {
     }
     
     private fun loadMenuItems() {
-        menuItemRepository.getAllMenuItems().observe(this, Observer { menuItems ->
+        menuItemRepository.getEnabledMenuItems().observe(this, Observer { menuItems ->
             selectedMenuItems.clear()
-            selectedMenuItems.addAll(menuItems.filter { it.isActive })
+            selectedMenuItems.addAll(menuItems.filter { it.isActive && it.isEnabled })
             menuSelectionAdapter.submitList(selectedMenuItems.toList())
         })
     }

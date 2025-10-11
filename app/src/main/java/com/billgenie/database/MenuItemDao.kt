@@ -10,11 +10,20 @@ interface MenuItemDao {
     @Query("SELECT * FROM menu_items WHERE isActive = 1 ORDER BY dateAdded DESC")
     fun getAllMenuItems(): LiveData<List<MenuItem>>
     
+    @Query("SELECT * FROM menu_items WHERE isActive = 1 AND isEnabled = 1 ORDER BY dateAdded DESC")
+    fun getEnabledMenuItems(): LiveData<List<MenuItem>>
+    
     @Query("SELECT * FROM menu_items WHERE category = :category AND isActive = 1 ORDER BY dateAdded DESC")
     fun getItemsByCategory(category: String): Flow<List<MenuItem>>
     
+    @Query("SELECT * FROM menu_items WHERE category = :category AND isActive = 1 AND isEnabled = 1 ORDER BY dateAdded DESC")
+    fun getEnabledItemsByCategory(category: String): Flow<List<MenuItem>>
+    
     @Query("SELECT * FROM menu_items WHERE category = :category AND isActive = 1 ORDER BY dateAdded DESC")
     suspend fun getItemsByCategorySync(category: String): List<MenuItem>
+    
+    @Query("SELECT * FROM menu_items WHERE category = :category AND isActive = 1 AND isEnabled = 1 ORDER BY dateAdded DESC")
+    suspend fun getEnabledItemsByCategorySync(category: String): List<MenuItem>
 
     @Query("SELECT * FROM menu_items WHERE id = :id")
     suspend fun getMenuItemById(id: Long): MenuItem?
@@ -51,6 +60,9 @@ interface MenuItemDao {
 
     @Query("UPDATE menu_items SET isActive = 0 WHERE id = :id")
     suspend fun softDeleteMenuItem(id: Long)
+    
+    @Query("UPDATE menu_items SET isEnabled = :isEnabled WHERE id = :id")
+    suspend fun setMenuItemEnabled(id: Long, isEnabled: Boolean)
 
     @Query("SELECT COUNT(*) FROM menu_items WHERE isActive = 1")
     suspend fun getActiveItemCount(): Int

@@ -200,11 +200,11 @@ class TakeOrderActivity : AppCompatActivity() {
             .setView(dialogView)
             .create()
         
-        // Load menu items for this category
+        // Load enabled menu items for this category
         lifecycleScope.launch {
             try {
                 val menuItems = withContext(Dispatchers.IO) {
-                    database.menuItemDao().getItemsByCategorySync(category.name)
+                    database.menuItemDao().getEnabledItemsByCategorySync(category.name)
                 }
                 
                 withContext(Dispatchers.Main) {

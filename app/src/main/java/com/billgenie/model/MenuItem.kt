@@ -13,5 +13,6 @@ data class MenuItem(
     val description: String? = null,
     val isActive: Boolean = true,
     val isVegetarian: Boolean = true,
+    val isEnabled: Boolean = true, // New field for enable/disable functionality
     val dateAdded: Long = System.currentTimeMillis()
 )

@@ -57,9 +57,38 @@ class RegisterActivity : AppCompatActivity() {
             Toast.makeText(this, "Creating new administrator account", Toast.LENGTH_SHORT).show()
         }
         
+        setupRoleSpinner()
         setupClickListeners()
     }
     
+    private fun setupRoleSpinner() {
+        // Get available roles based on context
+        val isPublicAccess = LoginActivity.getCurrentUserId(this) == -1
+        val availableRoles = if (isPublicAccess) {
+            // For public access (first admin creation), only allow ADMIN
+            listOf("Admin")
+        } else {
+            // For logged-in admin users, allow all roles
+            listOf("Staff", "Manager", "Admin")
+        }
+        
+        // Setup role dropdown
+        val roleAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, availableRoles)
+        binding.spinnerRole.setAdapter(roleAdapter)
+        
+        // Set default selection
+        binding.spinnerRole.setText(availableRoles[0], false)
+        
+        // Update button text based on selection
+        binding.spinnerRole.setOnItemClickListener { _, _, position, _ ->
+            val selectedRole = availableRoles[position]
+            binding.btnRegister.text = "Create $selectedRole Account"
+        }
+        
+        // Set initial button text
+        binding.btnRegister.text = "Create ${availableRoles[0]} Account"
+    }
+
     private fun showRegistrationBlockedMessage() {
         // Hide all form elements and show message
         binding.tilFullName.isEnabled = false
@@ -67,6 +96,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.tilEmail.isEnabled = false
         binding.tilPassword.isEnabled = false
         binding.tilConfirmPassword.isEnabled = false
+        binding.tilRole.isEnabled = false
         binding.btnRegister.isEnabled = false
         
         // Set opacity to show they're disabled
@@ -75,6 +105,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.tilEmail.alpha = 0.5f
         binding.tilPassword.alpha = 0.5f
         binding.tilConfirmPassword.alpha = 0.5f
+        binding.tilRole.alpha = 0.5f
         binding.btnRegister.alpha = 0.5f
         
         Toast.makeText(this, 
@@ -132,8 +163,17 @@ class RegisterActivity : AppCompatActivity() {
         val password = binding.etPassword.text.toString()
         val confirmPassword = binding.etConfirmPassword.text.toString()
         
+        // Get selected role from spinner
+        val selectedRoleDisplay = binding.spinnerRole.text.toString()
+        val role = when (selectedRoleDisplay) {
+            "Staff" -> RoleManager.ROLE_STAFF
+            "Manager" -> RoleManager.ROLE_MANAGER  
+            "Admin" -> RoleManager.ROLE_ADMIN
+            else -> RoleManager.ROLE_STAFF // Default fallback
+        }
+        
         if (validateInput(fullName, username, email, password, confirmPassword)) {
-            performRegistration(fullName, username, email, password, "ADMIN")
+            performRegistration(fullName, username, email, password, role)
         }
     }
     

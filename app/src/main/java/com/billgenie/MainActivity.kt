@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         setupReminderManager()
         setupToolbar()
         setupClickListeners()
+        setupRoleBasedUI()
         initializeDatabase()
         applyRoleBasedRestrictions()
         handleNotificationIntent()
@@ -137,6 +138,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    private fun setupRoleBasedUI() {
+        val currentUserRole = LoginActivity.getCurrentUserRole(this)
+        
+        when (currentUserRole) {
+            RoleManager.ROLE_STAFF -> {
+                // Staff can only see Orders & Billing
+                binding.cardMenuPricing.visibility = View.GONE
+                binding.cardIngredients.visibility = View.GONE
+                binding.cardInventory.visibility = View.GONE
+                binding.cardSettings.visibility = View.GONE
+                binding.cardReports.visibility = View.GONE
+                
+                // Update toolbar title to reflect limited access
+                supportActionBar?.title = "BillGenie - Staff Dashboard"
+            }
+            RoleManager.ROLE_MANAGER -> {
+                // Manager can see Inventory and Reports but NOT Menu/Pricing, Ingredients, or Settings
+                binding.cardMenuPricing.visibility = View.GONE
+                binding.cardIngredients.visibility = View.GONE
+                binding.cardSettings.visibility = View.GONE
+                supportActionBar?.title = "BillGenie - Manager Dashboard"
+            }
+            RoleManager.ROLE_ADMIN -> {
+                // Admin sees everything (default - no changes needed)
+                supportActionBar?.title = "BillGenie - Admin Dashboard"
+            }
+            else -> {
+                // Default to staff permissions for safety
+                binding.cardMenuPricing.visibility = View.GONE
+                binding.cardIngredients.visibility = View.GONE
+                binding.cardInventory.visibility = View.GONE
+                binding.cardSettings.visibility = View.GONE
+                binding.cardReports.visibility = View.GONE
+                supportActionBar?.title = "BillGenie - Limited Access"
+            }
+        }
+    }
+
     private fun initializeDatabase() {
         database = BillGenieDatabase.getDatabase(this)
     }
@@ -182,8 +221,8 @@ class MainActivity : AppCompatActivity() {
         val userRole = RoleManager.getCurrentUserRole(this)
         when (userRole) {
             RoleManager.ROLE_STAFF -> {
-                // Staff can see basic menu items but might have limited actions
-                // Keep all menu items visible for now
+                // Staff can only logout, no settings access
+                menu.findItem(R.id.action_settings)?.isVisible = false
             }
             RoleManager.ROLE_MANAGER -> {
                 // Manager can see all menu items

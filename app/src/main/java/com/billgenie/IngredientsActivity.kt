@@ -279,7 +279,34 @@ class IngredientsActivity : AppCompatActivity() {
 
         try {
             dialog.show()
-            android.util.Log.d("IngredientsActivity", "Dialog shown successfully")
+            
+            // Enhanced keyboard handling to ensure buttons remain accessible
+            dialog.window?.apply {
+                setSoftInputMode(
+                    android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
+                    android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN
+                )
+                // Set dialog to be full width with proper margins
+                setLayout(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            
+            // Add touch listener to dismiss keyboard when tapping outside input fields
+            dialogView.setOnTouchListener { view, event ->
+                if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                    val currentFocus = dialog.currentFocus
+                    if (currentFocus != null) {
+                        val inputMethodManager = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                        inputMethodManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+                        currentFocus.clearFocus()
+                    }
+                }
+                false
+            }
+            
+            android.util.Log.d("IngredientsActivity", "Dialog shown successfully with enhanced keyboard handling")
         } catch (e: Exception) {
             android.util.Log.e("IngredientsActivity", "Error showing dialog", e)
             Toast.makeText(this, "Error showing dialog: ${e.message}", Toast.LENGTH_SHORT).show()

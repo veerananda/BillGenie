@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Checked (ON) state - Primary color track -->
-    <item android:state_checked="true" android:color="@color/primary_color" />
-    <!-- Unchecked (OFF) state - Neutral track (similar to Cancel button style) -->
-    <item android:color="@color/outline_color" />
+    <!-- Checked (ON) state - Same color as thumb (purple_500) -->
+    <item android:state_checked="true" android:color="@color/purple_500" />
+    <!-- Unchecked (OFF) state - Light surface color -->
+    <item android:color="@color/surface_variant" />
 </selector>

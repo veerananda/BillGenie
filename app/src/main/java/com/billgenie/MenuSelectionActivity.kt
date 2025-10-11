@@ -203,13 +203,13 @@ class MenuSelectionActivity : AppCompatActivity() {
     
     private fun loadMenuItems() {
         try {
-            // Load all menu items
-            menuItemRepository.getAllMenuItems().observe(this, Observer { menuItems ->
+            // Load all enabled menu items
+            menuItemRepository.getEnabledMenuItems().observe(this, Observer { menuItems ->
                 android.util.Log.d("MenuSelectionActivity", "Loaded ${menuItems.size} menu items")
                 allMenuItems.clear()
                 selectedMenuItems.clear()
                 
-                var activeItems = menuItems.filter { it.isActive }
+                var activeItems = menuItems.filter { it.isActive && it.isEnabled }
                 
                 // Apply category filter if specified
                 if (selectedCategoryName.isNotEmpty()) {

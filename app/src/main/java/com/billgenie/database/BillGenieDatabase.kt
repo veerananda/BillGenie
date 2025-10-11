@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
 import com.billgenie.dao.UserDao
 import com.billgenie.dao.MenuCategoryDao
@@ -31,7 +33,7 @@ import com.billgenie.model.SalesRecord
 
 @Database(
     entities = [MenuItem::class, MenuCategory::class, Bill::class, BillItem::class, CustomerOrder::class, User::class, Ingredient::class, Recipe::class, InventoryItem::class, SalesRecord::class],
-    version = 13,
+    version = 14,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -53,6 +55,17 @@ abstract class BillGenieDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: BillGenieDatabase? = null
         
+        // Migration from version 13 to 14: Add isEnabled column to menu_items table
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add isEnabled column with default value true
+                database.execSQL("ALTER TABLE menu_items ADD COLUMN isEnabled INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+        
+        // Future migrations can be added here
+        // private val MIGRATION_14_15 = object : Migration(14, 15) { ... }
+        
         fun getDatabase(context: Context): BillGenieDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -60,7 +73,8 @@ abstract class BillGenieDatabase : RoomDatabase() {
                     BillGenieDatabase::class.java,
                     "billgenie_database"
                 )
-                .fallbackToDestructiveMigration() // Simple approach for now
+                .addMigrations(MIGRATION_13_14) // Add your migrations here
+                // .addMigrations(MIGRATION_13_14, MIGRATION_14_15) // For multiple migrations
                 .build()
                 INSTANCE = instance
                 instance

@@ -65,7 +65,7 @@ class MenuItemSelectionActivity : AppCompatActivity() {
     
     private fun loadMenuItems() {
         lifecycleScope.launch {
-            database.menuItemDao().getItemsByCategory(categoryName).collect { menuItems ->
+            database.menuItemDao().getEnabledItemsByCategory(categoryName).collect { menuItems ->
                 menuItemAdapter.submitList(menuItems)
                 
                 // Show/hide empty state

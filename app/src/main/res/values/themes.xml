@@ -16,11 +16,19 @@
         <item name="android:colorBackground">@color/white</item>
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="colorOnError">@color/on_error</item>
         
         <!-- Status bar -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         
         <!-- Window background -->
         <item name="android:windowBackground">@color/background_color</item>
+    </style>
+    
+    <!-- Custom Switch Style -->
+    <style name="CustomSwitchStyle" parent="Widget.Material3.CompoundButton.Switch">
+        <item name="thumbTint">@color/switch_thumb_color</item>
+        <item name="trackTint">@color/switch_track_color</item>
     </style>
 </resources>

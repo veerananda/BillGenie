@@ -24,7 +24,8 @@ class MenuCategoryAdapter(
     private val onItemAddClick: (MenuCategory) -> Unit,
     private val onItemEditClick: (MenuItem) -> Unit,
     private val onItemDeleteClick: (MenuItem) -> Unit,
-    private val onItemVegStatusChange: (MenuItem, Boolean) -> Unit
+    private val onItemVegStatusChange: (MenuItem, Boolean) -> Unit,
+    private val onItemEnabledStatusChange: (MenuItem, Boolean) -> Unit
 ) : RecyclerView.Adapter<MenuCategoryAdapter.CategoryViewHolder>() {
 
     inner class CategoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -74,7 +75,8 @@ class MenuCategoryAdapter(
                             items,
                             onItemEditClick,
                             onItemDeleteClick,
-                            onItemVegStatusChange
+                            onItemVegStatusChange,
+                            onItemEnabledStatusChange
                         )
                         recyclerViewItems.adapter = itemAdapter
                         recyclerViewItems.layoutManager = LinearLayoutManager(context)
@@ -107,13 +109,15 @@ class MenuItemNestedAdapter(
     private val items: List<MenuItem>,
     private val onItemEditClick: (MenuItem) -> Unit,
     private val onItemDeleteClick: (MenuItem) -> Unit,
-    private val onItemVegStatusChange: (MenuItem, Boolean) -> Unit
+    private val onItemVegStatusChange: (MenuItem, Boolean) -> Unit,
+    private val onItemEnabledStatusChange: (MenuItem, Boolean) -> Unit
 ) : RecyclerView.Adapter<MenuItemNestedAdapter.ItemViewHolder>() {
 
     inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvVegStatus: TextView = view.findViewById(R.id.tvVegStatus)
         val tvItemName: TextView = view.findViewById(R.id.tvItemName)
         val tvItemPrice: TextView = view.findViewById(R.id.tvItemPrice)
+        val switchItemEnabled: com.google.android.material.switchmaterial.SwitchMaterial = view.findViewById(R.id.switchItemEnabled)
         val ivEditItem: ImageView = view.findViewById(R.id.ivEditItem)
         val ivDeleteItem: ImageView = view.findViewById(R.id.ivDeleteItem)
 
@@ -121,6 +125,13 @@ class MenuItemNestedAdapter(
             tvVegStatus.text = if (item.isVegetarian) "🌱" else "🍖"
             tvItemName.text = item.name
             tvItemPrice.text = "₹${String.format("%.2f", item.price)}"
+            switchItemEnabled.isChecked = item.isEnabled
+
+            // Update visual state based on enabled status
+            val alpha = if (item.isEnabled) 1.0f else 0.5f
+            tvItemName.alpha = alpha
+            tvItemPrice.alpha = alpha
+            tvVegStatus.alpha = alpha
 
             ivEditItem.setOnClickListener {
                 onItemEditClick(item)
@@ -128,6 +139,10 @@ class MenuItemNestedAdapter(
 
             ivDeleteItem.setOnClickListener {
                 onItemDeleteClick(item)
+            }
+
+            switchItemEnabled.setOnCheckedChangeListener { _, isChecked ->
+                onItemEnabledStatusChange(item, isChecked)
             }
         }
     }
