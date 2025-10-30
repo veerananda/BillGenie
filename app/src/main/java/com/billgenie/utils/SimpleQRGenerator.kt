@@ -11,7 +11,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 
 class SimpleQRGenerator {
     companion object {
-        private const val MENU_BASE_URL = "https://veerananda.github.io/billgenie/"
+        private const val MENU_BASE_URL = "https://veerananda.github.io/BillGenie/"
         
         private fun encodeMenuData(menuItems: List<MenuItem>): String {
             // Convert menu items to simple data objects
