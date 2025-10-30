@@ -1,0 +1,18 @@
+{
+    "restaurant": "Taste of India",
+    "id": "sample",
+    "items": [
+        {
+            "name": "Butter Chicken",
+            "category": "Main Course",
+            "price": 320.00,
+            "isVegetarian": false
+        },
+        {
+            "name": "Paneer Tikka",
+            "category": "Starters",
+            "price": 220.00,
+            "isVegetarian": true
+        }
+    ]
+}

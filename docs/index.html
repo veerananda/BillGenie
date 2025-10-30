@@ -199,8 +199,14 @@
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
 
+            if (menuData.restaurant) {
+                document.querySelector('.restaurant-name').textContent = menuData.restaurant;
+            }
+
             const categories = {};
-            menuData.forEach(item => {
+            const menuItems = menuData.items || menuData;
+            
+            menuItems.forEach(item => {
                 if (!categories[item.category]) {
                     categories[item.category] = [];
                 }
@@ -229,22 +235,36 @@
             });
         }
 
-        // Load menu data from URL parameter
-        const menuDataStr = getQueryParam('data');
-        if (menuDataStr) {
+        async function loadMenu() {
+            const container = document.getElementById('menu-container');
+            const menuId = getQueryParam('id');
+            const menuDataStr = getQueryParam('data');
+
             try {
-                const decodedData = decodeMenuData(menuDataStr);
-                const menuData = JSON.parse(decodedData);
+                let menuData;
+                
+                if (menuDataStr) {
+                    // Direct data method
+                    const decodedData = decodeMenuData(menuDataStr);
+                    menuData = JSON.parse(decodedData);
+                } else if (menuId) {
+                    // Menu ID method - fetch from JSON file
+                    const response = await fetch(`menus/${menuId}.json`);
+                    if (!response.ok) throw new Error('Menu not found');
+                    menuData = await response.json();
+                } else {
+                    throw new Error('No menu data or ID provided');
+                }
+
                 displayMenu(menuData);
             } catch (e) {
-                document.getElementById('menu-container').innerHTML = 
-                    'Error loading menu. Please try again.';
-                console.error('Error parsing menu data:', e);
+                container.innerHTML = 'Error loading menu. Please try again.';
+                console.error('Error loading menu data:', e);
             }
-        } else {
-            document.getElementById('menu-container').innerHTML = 
-                'No menu data found.';
         }
+
+        // Load the menu when page loads
+        loadMenu();
     </script>
 </body>
 </html>
