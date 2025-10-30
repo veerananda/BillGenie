@@ -198,12 +198,20 @@
 
             try {
                 console.log('Fetching menu:', menuId);
-                const response = await fetch(`menus/${menuId}.json`);
-                console.log('Response status:', response.status);
+                const response = await fetch(`./menus/${menuId}.json`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                });
+                console.log('Response status:', response.status, response.statusText);
                 
                 if (!response.ok) {
                     console.error('Response not OK:', response.status, response.statusText);
-                    throw new Error('Menu not found');
+                    const text = await response.text();
+                    console.error('Response text:', text);
+                    throw new Error(`Menu not found (${response.status})`);
                 }
                 
                 const menuData = await response.json();
@@ -213,7 +221,8 @@
                 console.error('Detailed error:', error);
                 container.innerHTML = `<div class="error" style="color: #ff4757; text-align: center; padding: 20px;">
                     Unable to load menu. Please try again.<br>
-                    <small style="color: #888;">${error.message}</small>
+                    <small style="color: #888;">Error: ${error.message}</small><br>
+                    <small style="color: #888;">Menu ID: ${menuId}</small>
                 </div>`;
             }
         }
