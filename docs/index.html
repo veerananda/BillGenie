@@ -5,76 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Restaurant Menu</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Poppins', sans-serif;
             max-width: 800px; 
             margin: 0 auto; 
             padding: 15px;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            background-image: 
+                linear-gradient(135deg, rgba(255,255,255,0.2) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255,255,255,0.2) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255,255,255,0.2) 25%, transparent 25%);
+            background-position: 10px 0, 10px 0, 0 0, 0 0;
+            background-size: 20px 20px;
+            background-repeat: repeat;
+            min-height: 100vh;
         }
+
         .menu-card {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             margin-bottom: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
+
         .category { 
-            background: #f8f8f8; 
-            padding: 15px;
-            margin-top: 20px; 
-            border-radius: 5px;
-            border-left: 4px solid #4CAF50;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            padding: 20px;
+            margin-top: 25px; 
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
         }
+
+        .category::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, #4CAF50, #45a049);
+        }
+
         .category h2 {
             margin: 0;
-            color: #333;
+            color: #2c3e50;
             font-size: 1.5em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
+
         .item { 
             display: flex; 
             justify-content: space-between; 
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             align-items: center;
+            transition: all 0.3s ease;
         }
+
+        .item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(to right, rgba(76,175,80,0.05), transparent);
+            padding-left: 10px;
+            border-radius: 8px;
+        }
+
         .item:last-child {
             border-bottom: none;
         }
+
         .item-name {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            font-size: 1.05em;
+            color: #34495e;
         }
+
         .veg-indicator {
-            width: 16px;
-            height: 16px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
+            position: relative;
+            border: 2px solid currentColor;
         }
-        .veg { background-color: #4CAF50; }
-        .non-veg { background-color: #f44336; }
+
+        .veg { 
+            color: #4CAF50;
+            background-color: #4CAF50;
+        }
+
+        .non-veg { 
+            color: #f44336;
+            background-color: #f44336;
+        }
+
         .price { 
-            font-weight: bold;
+            font-weight: 600;
             color: #2196F3;
+            font-size: 1.1em;
+            background: rgba(33,150,243,0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
         }
+
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
         }
+
         .restaurant-name {
-            font-size: 2em;
-            color: #333;
+            font-size: 2.5em;
+            color: #2c3e50;
             margin: 0;
+            font-weight: 600;
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #2c3e50; /* Fallback */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
+
         @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
             .menu-card {
                 padding: 15px;
+                border-radius: 12px;
             }
             .category {
-                padding: 10px;
+                padding: 15px;
+                margin-top: 15px;
+            }
+            .restaurant-name {
+                font-size: 2em;
+            }
+            .item-name {
+                font-size: 1em;
             }
         }
     </style>
