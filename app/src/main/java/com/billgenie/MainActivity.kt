@@ -237,6 +237,11 @@ class MainActivity : AppCompatActivity() {
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_qr_menu -> {
+                val intent = Intent(this, QRMenuActivity::class.java)
+                startActivity(intent)
+                true
+            }
             R.id.action_settings -> {
                 showAppInfo()
                 true

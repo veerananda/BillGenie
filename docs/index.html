@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Restaurant Menu</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 15px;
+            background-color: #f5f5f5;
+        }
+        .menu-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .category { 
+            background: #f8f8f8; 
+            padding: 15px;
+            margin-top: 20px; 
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .category h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+        .item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .veg-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        .veg { background-color: #4CAF50; }
+        .non-veg { background-color: #f44336; }
+        .price { 
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .restaurant-name {
+            font-size: 2em;
+            color: #333;
+            margin: 0;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .menu-card {
+                padding: 15px;
+            }
+            .category {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="restaurant-name">Restaurant Menu</h1>
+    </div>
+    <div class="menu-card" id="menu-container">
+        Loading menu...
+    </div>
+
+    <script>
+        function decodeMenuData(str) {
+            return decodeURIComponent(str);
+        }
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function displayMenu(menuData) {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            const categories = {};
+            menuData.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+
+            Object.entries(categories).forEach(([category, items]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                categoryDiv.innerHTML = `<h2>${category}</h2>`;
+
+                items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'item';
+                    itemDiv.innerHTML = `
+                        <div class="item-name">
+                            <div class="veg-indicator ${item.isVegetarian ? 'veg' : 'non-veg'}"></div>
+                            ${item.name}
+                        </div>
+                        <span class="price">₹${item.price.toFixed(2)}</span>
+                    `;
+                    categoryDiv.appendChild(itemDiv);
+                });
+
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        // Load menu data from URL parameter
+        const menuDataStr = getQueryParam('data');
+        if (menuDataStr) {
+            try {
+                const decodedData = decodeMenuData(menuDataStr);
+                const menuData = JSON.parse(decodedData);
+                displayMenu(menuData);
+            } catch (e) {
+                document.getElementById('menu-container').innerHTML = 
+                    'Error loading menu. Please try again.';
+                console.error('Error parsing menu data:', e);
+            }
+        } else {
+            document.getElementById('menu-container').innerHTML = 
+                'No menu data found.';
+        }
+    </script>
+</body>
+</html>

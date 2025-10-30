@@ -19,6 +19,9 @@ interface MenuItemDao {
     @Query("SELECT * FROM menu_items WHERE category = :category AND isActive = 1 AND isEnabled = 1 ORDER BY dateAdded DESC")
     fun getEnabledItemsByCategory(category: String): Flow<List<MenuItem>>
     
+    @Query("SELECT * FROM menu_items WHERE isActive = 1 AND isEnabled = 1 ORDER BY category ASC, name ASC")
+    suspend fun getAllEnabledMenuItemsSync(): List<MenuItem>
+    
     @Query("SELECT * FROM menu_items WHERE category = :category AND isActive = 1 ORDER BY dateAdded DESC")
     suspend fun getItemsByCategorySync(category: String): List<MenuItem>
     

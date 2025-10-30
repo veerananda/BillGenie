@@ -117,6 +117,34 @@
             android:exported="false"
             android:parentActivityName=".MainActivity" />
             
+        <activity
+            android:name=".QRMenuActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+            
+        <activity
+            android:name=".MenuViewActivity"
+            android:exported="true"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="billgenie" android:host="menu" />
+            </intent-filter>
+        </activity>
+            
+        <!-- FileProvider for sharing QR codes -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+            
         <!-- Backup Reminder Receiver -->
         <receiver
             android:name=".BackupReminderReceiver"
