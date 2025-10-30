@@ -186,33 +186,47 @@
     </div>
 
     <script>
-        function decodeMenuData(str) {
-            return decodeURIComponent(str);
-        }
-
-        function getQueryParam(param) {
+        async function loadMenu() {
+            const container = document.getElementById('menu-container');
             const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
+            const menuId = urlParams.get('m');
+
+            if (!menuId) {
+                container.innerHTML = '<div class="error">Invalid menu link</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`menus/${menuId}.json`);
+                if (!response.ok) throw new Error('Menu not found');
+                
+                const menuData = await response.json();
+                displayMenu(menuData);
+            } catch (error) {
+                container.innerHTML = '<div class="error">Unable to load menu. Please try again.</div>';
+                console.error('Error loading menu:', error);
+            }
         }
 
         function displayMenu(menuData) {
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
 
-            if (menuData.restaurant) {
-                document.querySelector('.restaurant-name').textContent = menuData.restaurant;
+            // Update restaurant name
+            if (menuData.name) {
+                document.querySelector('.restaurant-name').textContent = menuData.name;
             }
 
+            // Group items by category
             const categories = {};
-            const menuItems = menuData.items || menuData;
-            
-            menuItems.forEach(item => {
+            menuData.items.forEach(item => {
                 if (!categories[item.category]) {
                     categories[item.category] = [];
                 }
                 categories[item.category].push(item);
             });
 
+            // Display categories and items
             Object.entries(categories).forEach(([category, items]) => {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'category';
@@ -235,36 +249,8 @@
             });
         }
 
-        async function loadMenu() {
-            const container = document.getElementById('menu-container');
-            const menuId = getQueryParam('id');
-            const menuDataStr = getQueryParam('data');
-
-            try {
-                let menuData;
-                
-                if (menuDataStr) {
-                    // Direct data method
-                    const decodedData = decodeMenuData(menuDataStr);
-                    menuData = JSON.parse(decodedData);
-                } else if (menuId) {
-                    // Menu ID method - fetch from JSON file
-                    const response = await fetch(`menus/${menuId}.json`);
-                    if (!response.ok) throw new Error('Menu not found');
-                    menuData = await response.json();
-                } else {
-                    throw new Error('No menu data or ID provided');
-                }
-
-                displayMenu(menuData);
-            } catch (e) {
-                container.innerHTML = 'Error loading menu. Please try again.';
-                console.error('Error loading menu data:', e);
-            }
-        }
-
-        // Load the menu when page loads
-        loadMenu();
+        // Load menu when page loads
+        window.addEventListener('DOMContentLoaded', loadMenu);
     </script>
 </body>
 </html>

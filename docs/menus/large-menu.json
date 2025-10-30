@@ -1,0 +1,22 @@
+{
+    "restaurant": "Grand Feast Restaurant",
+    "id": "large-menu",
+    "items": [
+        {
+            "category": "Appetizers",
+            "items": [
+                {"name": "Spring Rolls", "price": 150.00, "isVegetarian": true},
+                {"name": "Chicken Wings", "price": 280.00, "isVegetarian": false},
+                {"name": "Paneer 65", "price": 220.00, "isVegetarian": true}
+            ]
+        },
+        {
+            "category": "Soups",
+            "items": [
+                {"name": "Hot & Sour Soup", "price": 130.00, "isVegetarian": true},
+                {"name": "Sweet Corn Soup", "price": 120.00, "isVegetarian": true},
+                {"name": "Chicken Soup", "price": 150.00, "isVegetarian": false}
+            ]
+        }
+    ]
+}

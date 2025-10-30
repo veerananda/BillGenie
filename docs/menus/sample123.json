@@ -1,0 +1,24 @@
+{
+    "name": "Taste of India",
+    "id": "sample123",
+    "items": [
+        {
+            "name": "Butter Chicken",
+            "category": "Main Course",
+            "price": 320.00,
+            "isVegetarian": false
+        },
+        {
+            "name": "Paneer Tikka",
+            "category": "Starters",
+            "price": 220.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Dal Makhani",
+            "category": "Main Course",
+            "price": 180.00,
+            "isVegetarian": true
+        }
+    ]
+}
