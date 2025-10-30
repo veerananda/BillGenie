@@ -1,0 +1,72 @@
+{
+    "name": "Grand Restaurant",
+    "id": "large-test",
+    "items": [
+        {
+            "name": "Classic Caesar Salad",
+            "category": "Starters",
+            "price": 220.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Bruschetta",
+            "category": "Starters",
+            "price": 180.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Chicken Wings",
+            "category": "Starters",
+            "price": 340.00,
+            "isVegetarian": false
+        },
+        {
+            "name": "Margherita Pizza",
+            "category": "Main Course",
+            "price": 450.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Pepperoni Pizza",
+            "category": "Main Course",
+            "price": 550.00,
+            "isVegetarian": false
+        },
+        {
+            "name": "Grilled Salmon",
+            "category": "Seafood",
+            "price": 780.00,
+            "isVegetarian": false
+        },
+        {
+            "name": "Fish and Chips",
+            "category": "Seafood",
+            "price": 620.00,
+            "isVegetarian": false
+        },
+        {
+            "name": "Chocolate Brownie",
+            "category": "Desserts",
+            "price": 220.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Ice Cream Sundae",
+            "category": "Desserts",
+            "price": 180.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Cappuccino",
+            "category": "Beverages",
+            "price": 140.00,
+            "isVegetarian": true
+        },
+        {
+            "name": "Fresh Orange Juice",
+            "category": "Beverages",
+            "price": 120.00,
+            "isVegetarian": true
+        }
+    ]
+}
